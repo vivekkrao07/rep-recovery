@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d12">
+  <meta name="description" content="A personal workout recovery and readiness dashboard.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>Rep Recovery</title>
+  <style>
+    :root{--bg:#0b0d12;--panel:#131720;--panel2:#191f2b;--line:#293140;--text:#f3f5fa;--muted:#929caf;--accent:#b8f36b;--green:#a8ef70;--yellow:#ffd166;--red:#ff7777;--blue:#8bb7ff}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(ellipse at top right,#1b2632 0,transparent 42%),var(--bg);color:var(--text);font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    button,input,select,textarea{font:inherit} button{cursor:pointer}
+    .shell{max-width:1080px;margin:0 auto;padding:22px 18px 90px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}
+    .brand{display:flex;align-items:center;gap:12px}.logo{width:42px;height:42px;border-radius:14px;background:var(--accent);color:#11170b;display:grid;place-items:center;font-weight:950;font-size:20px}
+    h1{font-size:22px;letter-spacing:-.6px;margin:0}.subtitle{color:var(--muted);font-size:12px;margin-top:4px}
+    .badge{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:8px 11px;color:var(--muted)}
+    .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-bottom:16px}
+    .card{background:linear-gradient(145deg,rgba(25,31,43,.96),rgba(17,21,29,.96));border:1px solid var(--line);border-radius:22px;padding:20px;min-width:0}
+    .eyebrow{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;font-weight:800}
+    .hero h2{font-size:30px;letter-spacing:-1.1px;margin:12px 0 8px}.hero p{color:var(--muted);font-size:13px;line-height:1.6;margin:0;max-width:500px}
+    .scorebox{display:flex;align-items:center;gap:18px;height:100%}.ring{--score:0; width:112px;height:112px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) calc(var(--score)*1%),#2b3341 0);position:relative;flex-shrink:0}
+    .ring:before{content:"";position:absolute;inset:8px;background:#171c26;border-radius:50%}.ring-inner{position:relative;text-align:center}.ring strong{display:block;font-size:27px;line-height:1}.ring small{font-size:10px;color:var(--muted)}
+    .score-copy h3{margin:0 0 7px;font-size:17px}.score-copy p{font-size:12px;line-height:1.5;color:var(--muted);margin:0}
+    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+    .metric{padding:16px 18px}.metric .value{font-size:25px;font-weight:800;letter-spacing:-.8px;margin:8px 0 3px}.metric .unit{font-size:11px;color:var(--muted)}.metric .foot{font-size:11px;color:var(--muted);margin-top:10px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:25px 0 13px}.section-head h2{font-size:19px;letter-spacing:-.5px;margin:0}.section-head p{font-size:12px;color:var(--muted);margin:5px 0 0}
+    .muscles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    .muscle{padding:15px 16px}.muscle-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.muscle-name{font-weight:750;font-size:14px}.status{font-size:10px;font-weight:800;padding:6px 8px;border-radius:999px;background:#242b36;color:var(--muted);white-space:nowrap}.status.ready{color:var(--green);background:#1b2b1c}.status.recovering{color:var(--yellow);background:#332b1b}.status.recent{color:var(--red);background:#351f24}
+    .bar{height:6px;border-radius:99px;background:#2a303d;margin:13px 0 8px;overflow:hidden}.bar span{display:block;height:100%;border-radius:99px;background:var(--accent);width:0;transition:width .25s}
+    .muscle-bottom{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:11px}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form-card h3{font-size:16px;margin:0 0 6px}.form-card .hint{font-size:12px;color:var(--muted);line-height:1.5;margin:0 0 16px}
+    label{display:block;font-size:12px;color:#c6ccda;margin:12px 0 6px}input,select,textarea{width:100%;border:1px solid #303949;background:#0f131b;color:var(--text);border-radius:11px;padding:11px 12px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--accent)}input[type=checkbox]{width:auto;accent-color:var(--accent)}
+    .checks{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:8px}.check{display:flex;align-items:center;gap:8px;border:1px solid #303949;padding:9px 10px;border-radius:10px;color:#d5dae4;font-size:12px}
+    .btn{border:0;border-radius:12px;padding:12px 15px;font-weight:850;font-size:12px;background:var(--accent);color:#12170d}.btn.secondary{background:#252d3a;color:var(--text);border:1px solid #354052}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+    .history{display:flex;flex-direction:column;gap:9px}.history-item{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px 14px;border:1px solid var(--line);border-radius:13px;background:#11151d}.history-item strong{font-size:13px}.history-item small{display:block;color:var(--muted);font-size:11px;margin-top:4px}.empty{color:var(--muted);font-size:12px;padding:18px;text-align:center;border:1px dashed #343d4d;border-radius:14px}
+    .note{border:1px solid #3a3a2b;background:#222116;color:#d7d0a7;padding:13px 14px;border-radius:13px;font-size:11px;line-height:1.55;margin-top:17px}
+    footer{text-align:center;color:#6f798b;font-size:10px;margin-top:28px;line-height:1.7}
+    .tabs{display:none}
+    @media(max-width:700px){.shell{padding:17px 13px 35px}.hero{grid-template-columns:1fr}.hero h2{font-size:26px}.scorebox{justify-content:flex-start}.metrics{gap:8px}.metric{padding:13px 12px}.metric .value{font-size:21px}.metric .foot{font-size:10px}.muscles{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}.badge{display:none}.section-head{margin-top:22px}header{margin-bottom:18px}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <div class="brand"><div class="logo">R</div><div><h1>Rep Recovery</h1><div class="subtitle">YOUR TRAINING. YOUR BASELINE. YOUR CALL.</div></div></div>
+    <div class="badge">PERSONAL DASHBOARD · BETA</div>
+  </header>
+
+  <section class="hero">
+    <div class="card">
+      <div class="eyebrow">Daily overview</div>
+      <h2 id="greeting">Ready when you are.</h2>
+      <p id="overviewText">Log a workout and your recovery timeline will start here. Add your latest sleep and heart metrics to build a personal trend.</p>
+    </div>
+    <div class="card scorebox">
+      <div class="ring" id="scoreRing" style="--score:0"><div class="ring-inner"><strong id="scoreValue">—</strong><small>READINESS</small></div></div>
+      <div class="score-copy"><h3 id="scoreLabel">Not enough data</h3><p id="scoreText">Add sleep, resting heart rate and HRV to get a cautious estimate against your own baseline.</p></div>
+    </div>
+  </section>
+
+  <section class="metrics">
+    <div class="card metric"><div class="eyebrow">Sleep last night</div><div class="value" id="sleepValue">—</div><div class="unit">hours</div><div class="foot" id="sleepFoot">Add a sleep entry</div></div>
+    <div class="card metric"><div class="eyebrow">Resting HR</div><div class="value" id="rhrValue">—</div><div class="unit">beats / min</div><div class="foot" id="rhrFoot">Add a measurement</div></div>
+    <div class="card metric"><div class="eyebrow">HRV</div><div class="value" id="hrvValue">—</div><div class="unit">milliseconds</div><div class="foot" id="hrvFoot">Add a measurement</div></div>
+  </section>
+
+  <div class="section-head"><div><h2>Muscle recovery</h2><p>Time-based estimates from your logged sessions.</p></div><button class="btn secondary" id="clearDataBtn">Reset data</button></div>
+  <section class="muscles" id="muscleGrid"></section>
+
+  <section class="card" style="margin:18px 0">
+    <div class="section-head" style="margin:0 0 8px">
+      <div><h2>Cloud sync</h2><p>Send this device's saved entries to your Rep Recovery database, or load records already stored there.</p></div>
+    </div>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn" id="cloudUploadBtn" type="button">Upload device data</button>
+      <button class="btn secondary" id="cloudLoadBtn" type="button">Load cloud data</button>
+      <span id="cloudStatus" style="align-self:center;color:var(--muted);font-size:12px">Not connected yet</span>
+    </div>
+    <p class="hint" style="font-size:11px;color:var(--muted);line-height:1.5;margin:12px 0 0">API: rep-recovery-api · Cloud sync is manual. Your existing local entries remain on this device.</p>
+  </section>
+
+  <div class="section-head"><div><h2>Update your data</h2><p>For the first version, entries are saved on this device.</p></div></div>
+  <section class="grid2">
+    <form class="card form-card" id="workoutForm">
+      <h3>Log a workout</h3><p class="hint">Select the muscle groups you trained. You can add a session after your gym workout or backfill an earlier date.</p>
+      <label for="workoutDate">Workout date & time</label><input type="datetime-local" id="workoutDate" required>
+      <label>Muscle groups trained</label><div class="checks" id="muscleChecks"></div>
+      <label for="workoutNotes">Notes (optional)</label><input id="workoutNotes" maxlength="120" placeholder="e.g. heavy chest session">
+      <div class="actions"><button class="btn" type="submit">Save workout</button></div>
+    </form>
+    <form class="card form-card" id="healthForm">
+      <h3>Daily health check-in</h3><p class="hint">Enter values from Apple Health / NoiseFit. This website cannot read Apple Health directly in Safari.</p>
+      <label for="healthDate">Date</label><input type="date" id="healthDate" required>
+      <label for="sleepInput">Sleep duration (hours)</label><input type="number" id="sleepInput" min="0" max="24" step="0.1" placeholder="e.g. 7.5">
+      <label for="rhrInput">Resting heart rate (bpm)</label><input type="number" id="rhrInput" min="25" max="220" step="1" placeholder="e.g. 58">
+      <label for="hrvInput">HRV (ms)</label><input type="number" id="hrvInput" min="1" max="300" step="1" placeholder="e.g. 62">
+      <div class="actions"><button class="btn" type="submit">Save check-in</button></div>
+    </form>
+  </section>
+
+  <div class="section-head"><div><h2>Recent activity</h2><p>Your latest workouts and health check-ins.</p></div><button class="btn secondary" id="exportBtn">Export backup</button></div>
+  <section class="history" id="historyList"></section>
+
+  <div class="note"><strong>Important:</strong> Readiness and muscle recovery are estimates, not medical measurements. HRV varies naturally; compare it with your own baseline rather than a universal target. If you feel unwell, unusually fatigued, dizzy, or have chest pain, don't rely on this score to decide whether to train.</div>
+  <footer>Rep Recovery · Private by default · Data stored in this browser on this device.<br>To sync across devices or receive automatic Noise REP data, a secure backend or a supported data-import workflow will be needed.</footer>
+</div>
+<script>
+const MUSCLES = [
+  {name:"Chest",hours:60},{name:"Triceps",hours:60},{name:"Back",hours:60},
+  {name:"Biceps",hours:48},{name:"Quads",hours:60},{name:"Hamstrings",hours:60},
+  {name:"Glutes",hours:60},{name:"Calves",hours:36},{name:"Shoulders",hours:48},{name:"Forearms",hours:36}
+];
+const KEY="repRecoveryPwa_v1";
+let state=loadState();
+function loadState(){try{return JSON.parse(localStorage.getItem(KEY))||{workouts:[],health:[]}}catch(e){return {workouts:[],health:[]}}}
+function saveState(){localStorage.setItem(KEY,JSON.stringify(state));render()}
+function localDateTimeValue(d=new Date()){const p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
+function todayValue(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}
+document.getElementById("workoutDate").value=localDateTimeValue();
+document.getElementById("healthDate").value=todayValue();
+document.getElementById("muscleChecks").innerHTML=MUSCLES.map(m=>`<label class="check"><input type="checkbox" value="${m.name}"> ${m.name}</label>`).join("");
+document.getElementById("workoutForm").addEventListener("submit",e=>{
+ e.preventDefault();const muscles=[...document.querySelectorAll("#muscleChecks input:checked")].map(x=>x.value);
+ if(!muscles.length){alert("Select at least one muscle group.");return}
+ state.workouts.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),date:new Date(document.getElementById("workoutDate").value).toISOString(),muscles,notes:document.getElementById("workoutNotes").value.trim()});
+ state.workouts.sort((a,b)=>new Date(b.date)-new Date(a.date));e.target.reset();document.getElementById("workoutDate").value=localDateTimeValue();saveState();
+});
+document.getElementById("healthForm").addEventListener("submit",e=>{
+ e.preventDefault();const date=document.getElementById("healthDate").value;
+ const item={date,sleep:num("sleepInput"),rhr:num("rhrInput"),hrv:num("hrvInput")};
+ if(item.sleep===null&&item.rhr===null&&item.hrv===null){alert("Enter at least one health value.");return}
+ state.health=state.health.filter(x=>x.date!==date);state.health.push(item);state.health.sort((a,b)=>b.date.localeCompare(a.date));e.target.reset();document.getElementById("healthDate").value=todayValue();saveState();
+});
+function num(id){const v=document.getElementById(id).value;return v===""?null:Number(v)}
+document.getElementById("clearDataBtn").addEventListener("click",()=>{if(confirm("Delete all workouts and health entries saved in this browser? This cannot be undone.")){state={workouts:[],health:[]};saveState()}});
+document.getElementById("exportBtn").addEventListener("click",()=>{
+ const blob=new Blob([JSON.stringify({app:"Rep Recovery",version:1,exportedAt:new Date().toISOString(),...state},null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="rep-recovery-backup.json";a.click();URL.revokeObjectURL(a.href);
+});
+function fmtDate(iso){return new Date(iso).toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}
+function recovery(m){
+ const related=state.workouts.filter(w=>w.muscles.includes(m.name)).sort((a,b)=>new Date(b.date)-new Date(a.date));
+ if(!related.length)return {pct:100,status:"No session logged",detail:"No workout history",remaining:0,last:null};
+ const last=new Date(related[0].date),elapsed=Math.max(0,(Date.now()-last.getTime())/36e5),pct=Math.min(100,Math.round(elapsed/m.hours*100)),remaining=Math.max(0,m.hours-elapsed);
+ let status=pct>=80?"Ready":pct>=50?"Recovering":"Recently trained";
+ return {pct,status,detail:elapsed>=m.hours?`Last trained ${Math.floor(elapsed/24)}d ago`:`${Math.ceil(remaining)}h estimated remaining`,remaining,last:related[0].date};
+}
+function readiness(){
+ const latest=state.health.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
+ if(!latest)return null;
+ let score=0,weights=0;
+ const h=state.health.slice().sort((a,b)=>a.date.localeCompare(b.date));
+ const withRhr=h.filter(x=>x.rhr!==null),withHrv=h.filter(x=>x.hrv!==null);
+ if(latest.sleep!==null){score+=Math.max(0,Math.min(100,latest.sleep/8*100))*.4;weights+=.4}
+ if(latest.rhr!==null){const base=withRhr.slice(-7).map(x=>x.rhr);const avg=base.reduce((a,b)=>a+b,0)/base.length;const s=base.length>=3?Math.max(0,Math.min(100,100-(latest.rhr-avg)*3)):65;score+=s*.3;weights+=.3}
+ if(latest.hrv!==null){const base=withHrv.slice(-7).map(x=>x.hrv);const avg=base.reduce((a,b)=>a+b,0)/base.length;const s=base.length>=3?Math.max(0,Math.min(100,latest.hrv/avg*100)):65;score+=s*.3;weights+=.3}
+ return {score:Math.round(score/weights),latest,weights};
+}
+function render(){
+ const grid=document.getElementById("muscleGrid");
+ grid.innerHTML=MUSCLES.map(m=>{const r=recovery(m);const cls=r.status==="Ready"||r.status==="No session logged"?"ready":r.status==="Recovering"?"recovering":"recent";
+ return `<article class="card muscle"><div class="muscle-top"><div class="muscle-name">${m.name}</div><span class="status ${cls}">${r.status}</span></div><div class="bar"><span style="width:${r.pct}%;${cls==="recent"?"background:var(--red)":cls==="recovering"?"background:var(--yellow)":""}"></span></div><div class="muscle-bottom"><span>${r.last?"Last: "+fmtDate(r.last):"No workout logged"}</span><span>${r.remaining>0?Math.ceil(r.remaining)+"h left":r.last?"Window passed":m.hours+"h target"}</span></div></article>`}).join("");
+ const rd=readiness();
+ if(rd){document.getElementById("scoreValue").textContent=rd.score;document.getElementById("scoreRing").style.setProperty("--score",rd.score);
+ document.getElementById("scoreLabel").textContent=rd.score>=80?"Looking good":rd.score>=60?"Take it steady":"Prioritise recovery";
+ document.getElementById("scoreText").textContent=rd.weights<.99?"Estimate based on limited entries; add more days to establish a baseline.":"Estimate versus your recent entries. Use alongside how you feel.";
+ document.getElementById("overviewText").textContent=`Latest check-in: ${rd.latest.date}. Your readiness estimate is based on the health values you've entered.`;
+ }else{document.getElementById("scoreValue").textContent="—";document.getElementById("scoreRing").style.setProperty("--score",0);document.getElementById("scoreLabel").textContent="Not enough data";document.getElementById("scoreText").textContent="Add sleep, resting heart rate and HRV to build a cautious estimate.";document.getElementById("overviewText").textContent="Log a workout and your recovery timeline will start here. Add your latest sleep and heart metrics to build a personal trend."}
+ const latest=state.health.slice().sort((a,b)=>b.date.localeCompare(a.date))[0];
+ document.getElementById("sleepValue").textContent=latest&&latest.sleep!==null?latest.sleep.toFixed(1):"—";
+ document.getElementById("rhrValue").textContent=latest&&latest.rhr!==null?latest.rhr:"—";
+ document.getElementById("hrvValue").textContent=latest&&latest.hrv!==null?latest.hrv:"—";
+ document.getElementById("sleepFoot").textContent=latest&&latest.sleep!==null?latest.date:"Add a sleep entry";
+ document.getElementById("rhrFoot").textContent=latest&&latest.rhr!==null?latest.date:"Add a measurement";
+ document.getElementById("hrvFoot").textContent=latest&&latest.hrv!==null?latest.date:"Add a measurement";
+ const items=[
+ ...state.workouts.map(w=>({kind:"Workout",date:w.date,title:w.muscles.join(" · "),sub:w.notes||"Workout logged",id:w.id})),
+ ...state.health.map(h=>({kind:"Health check-in",date:new Date(h.date+"T12:00:00").toISOString(),title:`${h.sleep!==null?h.sleep+"h sleep · ":""}${h.rhr!==null?h.rhr+" bpm RHR · ":""}${h.hrv!==null?h.hrv+" ms HRV":""}`.replace(/ · $/,""),sub:h.date,id:"health-"+h.date}))
+ ].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
+ document.getElementById("historyList").innerHTML=items.length?items.map(i=>`<div class="history-item"><div><strong>${i.kind}: ${i.title||"Entry"}</strong><small>${fmtDate(i.date)} · ${i.sub}</small></div><button class="btn secondary" data-delete="${i.id}" data-kind="${i.kind}" style="padding:8px 10px">Delete</button></div>`).join(""):`<div class="empty">Nothing logged yet. Add your first workout or health check-in above.</div>`;
+ document.querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>{if(b.dataset.kind==="Workout")state.workouts=state.workouts.filter(w=>w.id!==b.dataset.delete);else state.health=state.health.filter(h=>"health-"+h.date!==b.dataset.delete);saveState()}));
+}
+
+const API_BASE = "https://rep-recovery-api.vivekraosm2005.workers.dev";
+const cloudStatus = document.getElementById("cloudStatus");
+function setCloudStatus(message, bad=false) {
+  if (!cloudStatus) return;
+  cloudStatus.textContent = message;
+  cloudStatus.style.color = bad ? "var(--red)" : "var(--muted)";
+}
+async function postCloudRecord(data) {
+  const response = await fetch(`${API_BASE}/sync`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(data)
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.success) throw new Error(result.error || `HTTP ${response.status}`);
+  return result;
+}
+document.getElementById("cloudUploadBtn")?.addEventListener("click", async () => {
+  const button = document.getElementById("cloudUploadBtn");
+  button.disabled = true;
+  setCloudStatus("Uploading…");
+  try {
+    const entries = [
+      ...state.workouts.map(w => ({type:"workout", recordedAt:w.date, data:w})),
+      ...state.health.map(h => ({type:"health", recordedAt:h.date, data:h}))
+    ];
+    let sent = 0;
+    for (const entry of entries) {
+      await postCloudRecord(entry);
+      sent++;
+    }
+    setCloudStatus(`Uploaded ${sent} record${sent===1?"":"s"}.`);
+  } catch (error) {
+    setCloudStatus(`Upload failed: ${error.message}`, true);
+  } finally {
+    button.disabled = false;
+  }
+});
+document.getElementById("cloudLoadBtn")?.addEventListener("click", async () => {
+  const button = document.getElementById("cloudLoadBtn");
+  button.disabled = true;
+  setCloudStatus("Loading…");
+  try {
+    const response = await fetch(`${API_BASE}/records?limit=100`, {cache:"no-store"});
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+    const cloudWorkouts = [];
+    const cloudHealth = [];
+    for (const record of (result.records || [])) {
+      const payload = record.data || {};
+      const inner = payload.data || payload;
+      if (payload.type === "workout" && inner.date && Array.isArray(inner.muscles)) {
+        cloudWorkouts.push({...inner, id: inner.id || `cloud-${record.id}`});
+      } else if (payload.type === "health" && inner.date) {
+        cloudHealth.push({date:inner.date, sleep:inner.sleep ?? null, rhr:inner.rhr ?? null, hrv:inner.hrv ?? null});
+      }
+    }
+    // Merge by stable ID for workouts and by date for health entries.
+    const workoutMap = new Map(state.workouts.map(w => [w.id, w]));
+    cloudWorkouts.forEach(w => workoutMap.set(w.id, w));
+    const healthMap = new Map(state.health.map(h => [h.date, h]));
+    cloudHealth.forEach(h => healthMap.set(h.date, h));
+    state.workouts = [...workoutMap.values()].sort((a,b)=>new Date(b.date)-new Date(a.date));
+    state.health = [...healthMap.values()].sort((a,b)=>b.date.localeCompare(a.date));
+    localStorage.setItem(KEY, JSON.stringify(state));
+    render();
+    setCloudStatus(`Loaded cloud records. ${cloudWorkouts.length} workout(s), ${cloudHealth.length} health entry/entries found.`);
+  } catch (error) {
+    setCloudStatus(`Load failed: ${error.message}`, true);
+  } finally {
+    button.disabled = false;
+  }
+});
+
+render();
+if("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("./sw.js").catch(()=>{});
+</script>
+</body>
+</html>
